@@ -1,8 +1,12 @@
 from article_scraper import scrape_articles
 from summarizer import summarize_articles
 from sms_sender import send_sms_via_email
-from config import USER_PHONE_NUMBER
+from sms_sender_telegram import send_telegram_message
+from config import USER_PHONE_NUMBER, TELEGRAM_CHATID, TELEGRAM_BOT_API
 from email_processor import get_article_links
+import schedule
+import time
+from user_preferences import preferences
 
 def summarize_and_notify():
     """
@@ -16,8 +20,10 @@ def summarize_and_notify():
     summaries = summarize_articles(articles_content)
     carrier_gateway = "vtext.com"    # Verison gateway
     recipient_email = f"{USER_PHONE_NUMBER}@{carrier_gateway}"
+    send_telegram_message(TELEGRAM_CHATID, "Hey! This is your brief for today:", TELEGRAM_BOT_API)
     for summary in summaries:
-        send_sms_via_email(recipient_email, "Your Daily Tech Brief!", summary)
+        #send_sms_via_email(recipient_email, "Your Daily Tech Brief!", summary)
+        send_telegram_message(TELEGRAM_CHATID, summary, TELEGRAM_BOT_API)
 
 
 if __name__ == "__main__":
