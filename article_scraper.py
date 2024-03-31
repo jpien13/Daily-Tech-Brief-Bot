@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import time
 from typing import List, Union
 from urllib.parse import urlparse
+import re
+from user_preferences import preferences
 
 class ArticleScraper:
     def __init__(self, urls: List[str]):
@@ -34,20 +36,37 @@ class ArticleScraper:
 
     def parse_content(self, html: str) -> str:
         """
-        Parses HTML content to extract relevant article text.
-        
-        Looks for the main article container using a list of common selectors 
-        ('article', 'main', '.post-content', 'div'). Once the main content is found,
-        it extracts all paragraphs (<p> tags) and joins them into a single string.
+        Parses HTML content to extract relevant article text using heuristics
+        for identifying content-rich sections of a webpage.
         """
         soup = BeautifulSoup(html, 'html.parser')
-        # Attempt to find the main article container more broadly
-        for selector in ['article', 'main', '.post-content', 'div', '.content', 'section', '.text']:
-            content = soup.select_one(selector)
-            if content:
-                paragraphs = content.find_all(['p', 'li', 'span', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])
-                return '\\n'.join(p.get_text() for p in paragraphs if p.get_text().strip() != '')
-        return ""
+        
+        # Remove script and style elements
+        for script_or_style in soup(["script", "style"]):
+            script_or_style.decompose()
+        
+        # Heuristic: Look for blocks of text within certain tags, giving priority to more common content tags
+        content_tags = ['article', 'main', 'div', 'section']
+        likely_classes_patterns = ['content', 'post', 'text', 'article', 'body']
+        content = ""
+
+        for tag in content_tags:
+            for element in soup.find_all(tag):
+                # Check if class attribute of the tag hints at containing main content
+                class_text = " ".join(element.get("class", []))
+                if any(re.search(pattern, class_text, re.IGNORECASE) for pattern in likely_classes_patterns):
+                    paragraphs = element.find_all('p')
+                    current_content = '\n'.join(p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True))
+                    # Heuristic: Prefer the block with the most paragraphs
+                    if current_content.count('\n') > content.count('\n'):
+                        content = current_content
+
+        # If no content found with class hints, fall back to a simpler method
+        if not content:
+            paragraphs = soup.find_all('p')
+            content = '\n'.join(p.get_text(strip=True) for p in paragraphs if p.get_text(strip=True))
+
+        return content
 
     def scrape(self) -> List[str]:
         """
@@ -65,21 +84,26 @@ class ArticleScraper:
             html = self.fetch_article(url)
             if html:
                 article_text = self.parse_content(html)
-                articles_content.append(article_text)
+                if article_text != "":
+                    articles_content.append(article_text)
                 time.sleep(1)  # Sleep to be polite to the server
-            else:
-                articles_content.append("")
+        
         return articles_content
 
 def scrape_articles(urls):
+    """
+    Will return only num_articles of all the articles processed
+    """
     scraper = ArticleScraper(urls)
-    return scraper.scrape()
+    res = scraper.scrape()
+    return res[:preferences["num_articles"]]
 
 # Example usage for testing
 if __name__ == "__main__":
     """ RETURNS A LIST WHERE EACH ELEMENT IS A LONG STRING FOR EACH ARTICLE IN THE ARTICLES LIST"""
-    urls = ["https://www.ai21.com/jamba?utm_source=tldrai/1/0100018e8a609272-a5868679-d93b-4b21-b927-2e712c01c2c6-000000/0nEMLp6-F5LE0zznTWamxuLZL65HIvsod-49mCcnhss=346", "https://searchengineland.com/google-starts-testing-ai-overviews-from-sge-in-main-google-search-interface-438680?utm_source=tldrai"]
-    scraper = ArticleScraper(urls)
-    articles = scraper.scrape()
+    urls = ["https://www.cnbc.com/2024/03/25/elon-musk-requires-fsd-demo-for-every-prospective-tesla-buyer-in-north-america.html?utm_source=tldrnewsletter", "https://www.cnbc.com/2024/03/25/adam-neumann-submits-bid-of-more-than-500-million-to-buy-wework.html?utm_source=tldrnewsletter", "https://www.theregister.com/2024/03/25/ai_boom_nuclear/?utm_source=tldrnewsletter"]
+    articles = scrape_articles(urls)
+    print(len(articles))
     for article in articles:
         print(article[:20000])  # Print first 20,000 characters of each article for preview
+        print("-------------------------------------------")
