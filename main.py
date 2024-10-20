@@ -2,7 +2,9 @@ from article_scraper import scrape_articles
 from summarizer import summarize_articles
 from sms_sender import send_sms_via_email
 from sms_sender_telegram import send_telegram_message
+from sms_sender_slack import send_slack_message
 from config import USER_PHONE_NUMBER, TELEGRAM_CHATID, TELEGRAM_BOT_API
+from config import SLACK_BOT_OAUTH
 from email_processor import get_article_links
 from user_preferences import preferences
 
@@ -36,22 +38,27 @@ def summarize_and_notify():
     Step 5: Send summarized articles via SMS
     """
     article_links = get_article_links('dan@tldrnewsletter.com')
+    #article_links = get_article_links('pien.jason@gmail.com')
+
     articles_content = scrape_articles(article_links)
-    #for article in articles_content:
-    #    print(article)
-    #    print("#############################")
+    for article in articles_content:
+       print(article)
+       print("#############################")
     trimmed_articles = trim_articles_to_token_limit(articles_content, 4097)
     summaries = summarize_articles(trimmed_articles)
     #carrier_gateway = "vtext.com"    # Verison gateway
     #recipient_email = f"{USER_PHONE_NUMBER}@{carrier_gateway}"
     if len(summaries) > 0:
-        send_telegram_message(TELEGRAM_CHATID, "Hey! This is your brief for today (Loading...):", TELEGRAM_BOT_API)
+        #send_telegram_message(TELEGRAM_CHATID, "Hey! It's T.I.D.A.L 🌊 giving you your daily updates in tech 🚀🚀🚀! (Loading Content...)", TELEGRAM_BOT_API)
+        send_slack_message("Hey! It's T.I.D.A.L giving you your daily updates in tech! (Loading Content...)", SLACK_BOT_OAUTH,"#test")
     else:
-        send_telegram_message(TELEGRAM_CHATID, "Nothing as of now!", TELEGRAM_BOT_API)
+        #send_telegram_message(TELEGRAM_CHATID, "😅 Whoops! I've got nothing for you right now. Either I was unable to extract any content today or this was a hiccup! Sorry ", TELEGRAM_BOT_API)
+        send_slack_message("Whoops! I've got nothing for you right now. Either I was unable to extract any content today or this was a hiccup! Sorry ", SLACK_BOT_OAUTH, "#test")
 
     for summary in summaries:
         #send_sms_via_email(recipient_email, "Your Daily Tech Brief!", summary)
-        send_telegram_message(TELEGRAM_CHATID, summary, TELEGRAM_BOT_API)
+        #send_telegram_message(TELEGRAM_CHATID, summary, TELEGRAM_BOT_API)
+        send_slack_message(summary, SLACK_BOT_OAUTH, "#test")
 
 if __name__ == "__main__":
     summarize_and_notify()

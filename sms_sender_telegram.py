@@ -1,5 +1,6 @@
 import requests
 from config import TELEGRAM_BOT_API, TELEGRAM_CHATID
+
 def send_telegram_message(chat_id, message, bot_token):
     send_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'
     params = {

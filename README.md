@@ -24,6 +24,8 @@ OPENAI_API_KEY = "your_openai_api_key"  # Replace with your OpenAI API key
 TELEGRAM_BOT_API = "your_telegram_bot_api"  # Replace with your Telegram Bot API
 TELEGRAM_CHATID = "your_chat_id"  # Replace with your Telegram chat ID with your bot
 USER_PHONE_NUMBER = "1234567890"  # Replace with your phone number
+SLACK_BOT_OAUTH = "1234567890"      # Replace with your SLACK API
+
 ```
 
 ## Step 3: Obtaining API Keys and Passwords
@@ -56,6 +58,7 @@ This is a very early version of the bot. Therefore a few things (explainatory te
 
     You want to grab the id: XXXXXXXXXX and replace TELEGRAM_CHATID in config.py
 
+5. If you want to use, slack go to your workspace, in the main dropdown click 'tools & settings' -> manage apps. This will bring you to a browser in which you should select build from the top right. Click 'create new app' then click create from scratch. Add a name to the app and select the workspace you want your bot to exist in. You will get an API key for this bot which you should place in the config file. Then, in the browser again, go to 'OAuth and Permissions' section. Scroll down to scopes and under bot Token scopes add chat::write. Save and then go to 'Your Apps' and install the bot you just made. The last step is to navigate to the channel you want the bot to be in and type /invite @your-bot-name to invite your bot.
 
 ## Step 4: Automation
 
