@@ -30,9 +30,8 @@ jobs:
           USER_PHONE_NUMBER: ${{ secrets.USER_PHONE_NUMBER }}
           TELEGRAM_CHATID: ${{ secrets.TELEGRAM_CHATID }}
           TELEGRAM_BOT_API: ${{ secrets.TELEGRAM_BOT_API }}
-          SLACK_BOT_OAUTH: ${{ secrets.SLACK_BOT_OAUTH }}
           EMAIL_ADDRESS: ${{ secrets.EMAIL_ADDRESS }}
           EMAIL_PASSWORD: ${{ secrets.EMAIL_PASSWORD}}
-          OPENAI_API_KEY:  ${{OPENAI_API_KEY}}
+          OPENAI_API_KEY:  ${{secrets.OPENAI_API_KEY}}
         run: |
           python main.py
