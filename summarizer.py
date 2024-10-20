@@ -18,7 +18,7 @@ def summarize_articles(articles_content):
         try:
             response = openai.completions.create(
                 model="gpt-3.5-turbo-instruct",
-                prompt=f"Summarize this event in {preferences['summary_length']} words:\n\n{article} emphasizing key points. If there are technical explanations in the article, explain it in a simple way that retains the complexity of the information. The goal is to keep me up to date with events in tech.",
+                prompt=f"Summarize this event in {preferences['summary_length']} words:\n\n{article} emphasizing key points. If there are technical explanations in the article, explain it in a simple way that retains the complexity of the information. The goal is to keep me up to date with events in tech and their implications within the industry.",
                 temperature=0.5,
                 max_tokens=completion_tokens,
                 top_p=1,

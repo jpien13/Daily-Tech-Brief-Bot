@@ -3,7 +3,9 @@ from bs4 import BeautifulSoup
 import imaplib
 import email
 import logging
+import datetime
 from config import EMAIL_ADDRESS, EMAIL_PASSWORD
+
 
 # Setup basic logging
 logging.basicConfig(level=logging.INFO)
@@ -23,10 +25,28 @@ def connect_to_email_server():
         logging.error(f"Failed to connect to the email server: {e}")
         raise
 
+# def search_for_unread_emails(mail, sender_email):
+#     """Searches for unread emails from a specific sender."""
+#     try:
+#         status, email_ids = mail.search(None, '(UNSEEN FROM "{}")'.format(sender_email))
+#         if status != 'OK':
+#             logging.error("No emails found.")
+#             return []
+#         return email_ids[0].split()
+#     except Exception as e:
+#         logging.error(f"Error searching for emails: {e}")
+#         raise
+
 def search_for_unread_emails(mail, sender_email):
-    """Searches for unread emails from a specific sender."""
+    """Searches for unread emails from a specific sender, received on the current date."""
     try:
-        status, email_ids = mail.search(None, '(UNSEEN FROM "{}")'.format(sender_email))
+        # Get today's date in the required format
+        today_date = datetime.datetime.today().strftime('%d-%b-%Y')
+        
+        # Modify search query to include the date filter
+        search_criteria = '(UNSEEN FROM "{}" ON "{}")'.format(sender_email, today_date)
+        
+        status, email_ids = mail.search(None, search_criteria)
         if status != 'OK':
             logging.error("No emails found.")
             return []
