@@ -1,0 +1,31 @@
+name: Run Daily Tech Brief Bot
+
+on:
+  schedule:
+    - cron: '0 9 * * *'  # Runs every day at 9 AM UTC
+  workflow_dispatch:  # Allows manual trigger from the GitHub Actions tab
+
+jobs:
+  run-tech-brief:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run the script
+        env:
+          SLACK_BOT_OAUTH: ${{ secrets.SLACK_BOT_OAUTH }}
+          #TELEGRAM_BOT_API: ${{ secrets.TELEGRAM_BOT_API }}
+        run: |
+          python main.py
