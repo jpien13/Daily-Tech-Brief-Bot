@@ -1,7 +1,11 @@
 import smtplib
+import os
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from config import EMAIL_ADDRESS, EMAIL_PASSWORD
+
+# Access sensitive data from environment variables
+EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 def send_sms_via_email(recipient_email, subject, message):
     

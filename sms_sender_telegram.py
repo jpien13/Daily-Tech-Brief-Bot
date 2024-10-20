@@ -1,5 +1,10 @@
 import requests
-from config import TELEGRAM_BOT_API, TELEGRAM_CHATID
+import os
+# Access sensitive data from environment variables
+TELEGRAM_BOT_API = os.getenv('TELEGRAM_BOT_API')
+TELEGRAM_CHATID = os.getenv('TELEGRAM_CHATID')
+
+
 
 def send_telegram_message(chat_id, message, bot_token):
     send_url = f'https://api.telegram.org/bot{bot_token}/sendMessage'

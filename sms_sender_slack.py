@@ -1,6 +1,10 @@
 import requests
 from config import SLACK_BOT_OAUTH
 
+import os
+# Access sensitive data from environment variables
+SLACK_BOT_OAUTH = os.getenv('SLACK_BOT_OAUTH')
+
 def send_slack_message(message, slack_token, slack_channel):
     """Send a message to Slack using the OAuth token."""
     headers = {

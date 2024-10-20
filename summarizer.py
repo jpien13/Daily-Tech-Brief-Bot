@@ -1,7 +1,10 @@
 import openai
-from config import OPENAI_API_KEY
+import os
 from user_preferences import preferences
 from article_scraper import scrape_articles
+
+# Access sensitive data from environment variables
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 openai.api_key = OPENAI_API_KEY
 

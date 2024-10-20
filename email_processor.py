@@ -4,7 +4,11 @@ import imaplib
 import email
 import logging
 import datetime
-from config import EMAIL_ADDRESS, EMAIL_PASSWORD
+import os
+
+# Access sensitive data from environment variables
+EMAIL_ADDRESS = os.getenv('EMAIL_ADDRESS')
+EMAIL_PASSWORD = os.getenv('EMAIL_PASSWORD')
 
 
 # Setup basic logging
