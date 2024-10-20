@@ -1,4 +1,5 @@
 import requests
+import os
 
 # Access sensitive data from environment variables
 SLACK_BOT_OAUTH = os.getenv('SLACK_BOT_OAUTH')
