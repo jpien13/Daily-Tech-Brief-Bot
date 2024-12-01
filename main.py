@@ -37,9 +37,9 @@ def summarize_and_notify():
     Step 4: Summarize the scraped articles
     Step 5: Send summarized articles via Slack
     """
-    article_links = get_article_links('dan@tldrnewsletter.com')
+   #article_links = get_article_links('dan@tldrnewsletter.com')
     # Alternatively use another email, as needed
-    # article_links = get_article_links('pien.jason@gmail.com')
+    article_links = get_article_links('pien.jason@gmail.com')
 
     articles_content = scrape_articles(article_links)
     for article in articles_content:
