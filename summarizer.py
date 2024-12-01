@@ -8,20 +8,27 @@ OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
 openai.api_key = OPENAI_API_KEY
 
+def estimate_tokens(text):
+    """Estimates the number of tokens in a text."""
+    AVG_CHARS_PER_TOKEN = 4  # Rough approximation for GPT-like models
+    return len(text) / AVG_CHARS_PER_TOKEN
+
 def summarize_articles(articles_content):
     summaries = []
     for article in articles_content:
         # Estimate the number of tokens in the article
-        article_tokens = len(article.split())
-        available_tokens_for_completion = 4097 - article_tokens
+        article_tokens = estimate_tokens(article)
 
-        # Ensure we don't exceed the model's limit
+        # Set a safe minimum for available tokens
+        available_tokens_for_completion = max(0, 4097 - article_tokens)
+
+        # Ensure we calculate `completion_tokens` correctly
         completion_tokens = min(preferences['summary_length'] * 5, available_tokens_for_completion)
 
         try:
-            response = openai.completions.create(
+            response = openai.Completions.create(
                 model="gpt-3.5-turbo-instruct",
-                prompt=f"Summarize this event in {preferences['summary_length']} words:\n\n{article} emphasizing key points. If there are technical explanations in the article, explain it in a simple way that retains the complexity of the information. The goal is to keep me up to date with events in tech and their implications within the industry.",
+                prompt=f"Summarize this event in {preferences['summary_length']} words:\n\n{article} emphasizing key points.",
                 temperature=0.5,
                 max_tokens=completion_tokens,
                 top_p=1,
@@ -29,6 +36,12 @@ def summarize_articles(articles_content):
                 presence_penalty=0
             )
             summaries.append(response.choices[0].text.strip())
+        except openai.error.APIConnectionError as e:
+            print(f"OpenAI API connection error: {e}")
+            summaries.append("Error summarizing article: could not process due to connection.")
+        except openai.error.InvalidRequestError as e:
+            print(f"Invalid request to OpenAI API: {e}")
+            summaries.append("Error summarizing article: request parameters invalid.")
         except openai.error.OpenAIError as e:
             print(f"OpenAI API error: {e}")
             summaries.append("Error summarizing article: could not process.")
