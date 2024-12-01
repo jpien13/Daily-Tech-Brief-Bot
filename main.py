@@ -40,15 +40,13 @@ def summarize_and_notify():
    #article_links = get_article_links('dan@tldrnewsletter.com')
     # Alternatively use another email, as needed
     article_links = get_article_links('pien.jason@gmail.com')
-
+    print(f"Article Links: {article_links}")
     articles_content = scrape_articles(article_links)
-    for article in articles_content:
-       print(article)
-       print("#############################")
-
+    print(f"Articles Content: {articles_content}")
     trimmed_articles = trim_articles_to_token_limit(articles_content, 4097)
+    print(f"Trimmed Articles: {trimmed_articles}")
     summaries = summarize_articles(trimmed_articles)
-
+    print("TEST SUMMARIES LENGTH:" + str(len(summaries)))
     if len(summaries) > 0:
         send_slack_message("Hey! It's T.I.D.A.L giving you your daily updates in tech! (Loading Content...)", SLACK_BOT_OAUTH, "#test")
     else:
