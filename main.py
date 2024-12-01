@@ -22,11 +22,20 @@ def trim_articles_to_token_limit(articles, token_limit=4097):
     """Trims a list of articles to stay under a specified token limit."""
     total_tokens = sum(estimate_tokens(article) for article in articles)
     
-    # Remove articles from the list until the total token count is under the limit
-    while total_tokens > token_limit and articles:
-        removed_article = articles.pop()  # Remove the last article
-        total_tokens -= estimate_tokens(removed_article)  # Update total token count
-    
+    print(f"Initial Total Tokens: {total_tokens}")
+
+    # Remove articles until the total token count is under the limit
+    for article in articles:
+        article_tokens = estimate_tokens(article)
+        print(f"Article Tokens: {article_tokens}")
+        
+        if total_tokens > token_limit:
+            removed_article = articles.pop()
+            total_tokens -= estimate_tokens(removed_article)
+            print(f"Removed article. New Total Tokens: {total_tokens}")
+        else:
+            break
+
     return articles
 
 def summarize_and_notify():
